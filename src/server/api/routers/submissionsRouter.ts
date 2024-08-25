@@ -1,4 +1,4 @@
-import { formSchema } from "@/pages/submit/formSchema";
+import { formSchema } from "@/lib/formSchema";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { kv } from "@vercel/kv";
 import { z } from "zod";

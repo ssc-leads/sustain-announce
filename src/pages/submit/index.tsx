@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EVENT_CATEGORIES, formSchema } from "@/pages/submit/formSchema";
+import { EVENT_CATEGORIES, formSchema } from "@/lib/formSchema";
 import { api } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
