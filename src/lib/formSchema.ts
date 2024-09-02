@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 export const EVENT_CATEGORIES = [
   "Conference",
   "Speaker Event",
@@ -17,70 +18,80 @@ export const EVENT_CATEGORIES = [
   "Announcement with a Deadline",
 ] as const;
 
-const basicFormSchemaObject = z
-  .object({
-    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-    email: z.string().email({ message: "Invalid email address." }),
-    organizingGroup: z
-      .string()
-      .min(2, { message: "Organizing group is required." }),
-    typeOfSubmission: z.enum([
-      "event",
-      "opportunityWithDeadline",
-      "opportunityWithoutDeadline",
-    ]),
-    eventTitle: z.string().min(2, { message: "Event title is required." }),
-    shortTitle: z.string().optional(),
-    url: z.string().url({ message: "Invalid URL." }),
-    mainContactEmail: z.string().email({ message: "Invalid email address." }),
-    shortDescription: z.string().min(10, {
-      message: "Short description must be at least 10 characters.",
-    }),
-    firstAnnouncementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "Date must be in YYYY-MM-DD format",
-    }),
-    lastAnnouncementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "Date must be in YYYY-MM-DD format",
-    }),
-    advertiseOnSSCInsta: z.string().optional(),
-    additionalComments: z.string().optional(),
-    exceedsTwoWeeks: z.boolean().optional(),
+const basicFormSchemaObject = z.object({
+  id: z.string(),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  email: z.string().email({ message: "Invalid email address." }),
+  organizingGroup: z
+    .string()
+    .min(2, { message: "Organizing group is required." }),
+  typeOfSubmission: z.enum([
+    "event",
+    "opportunityWithDeadline",
+    "opportunityWithoutDeadline",
+  ]),
+  eventTitle: z.string().min(2, { message: "Event title is required." }),
+  shortTitle: z.string().optional(),
+  url: z.string().url({ message: "Invalid URL." }),
+  mainContactEmail: z.string().email({ message: "Invalid email address." }),
+  shortDescription: z.string().min(10, {
+    message: "Short description must be at least 10 characters.",
+  }),
+  firstAnnouncementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "Date must be in YYYY-MM-DD format",
+  }),
+  lastAnnouncementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "Date must be in YYYY-MM-DD format",
+  }),
+  advertiseOnSSCInsta: z.string().optional(),
+  additionalComments: z.string().optional(),
+  exceedsTwoWeeks: z.boolean().optional(),
 
-    physicalLocation: z.string().optional(),
-    eventOptions: z
-      .object({
-        addToCalendar: z.boolean().optional(),
-        isAllDayEvent: z.boolean().optional(),
-        isRecurringEvent: z.boolean().optional(),
-        eventStartDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+  physicalLocation: z.string().optional(),
+  eventOptions: z
+    .object({
+      addToCalendar: z.boolean().optional(),
+      isAllDayEvent: z.boolean().optional(),
+      isRecurringEvent: z.boolean().optional(),
+      eventStartDate: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
           message: "Date must be in YYYY-MM-DD format",
-        }).optional(),
-        eventStartTime: z.string().regex(/^\d{2}:\d{2}([AP]M)?$/, {
-          message: "Time must be in HH:MM or HH:MM AM/PM format (Eastern Time)"
-        }).optional(),
-        eventEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+        })
+        .optional(),
+      eventStartTime: z
+        .string()
+        .regex(/^\d{2}:\d{2}([AP]M)?$/, {
+          message: "Time must be in HH:MM or HH:MM AM/PM format (Eastern Time)",
+        })
+        .optional(),
+      eventEndDate: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
           message: "Date must be in YYYY-MM-DD format",
-        }).optional(),
-        eventEndTime: z.string().regex(/^\d{2}:\d{2}$/, {
-          message: "Time must be in HH:MM format (Eastern Time)"
-        }).optional(),
-        recurringEventDetails: z.string().optional(),
-      })
-      .optional(),
-    eventCategory: z.enum(EVENT_CATEGORIES).optional(),
-  })
+        })
+        .optional(),
+      eventEndTime: z
+        .string()
+        .regex(/^\d{2}:\d{2}$/, {
+          message: "Time must be in HH:MM format (Eastern Time)",
+        })
+        .optional(),
+      recurringEventDetails: z.string().optional(),
+    })
+    .optional(),
+  eventCategory: z.enum(EVENT_CATEGORIES).optional(),
+});
 export const formSchema = basicFormSchemaObject
   .refine(
     (data) => {
-      if (
-        data.typeOfSubmission === "event"      ) {
+      if (data.typeOfSubmission === "event") {
         return data.physicalLocation !== undefined;
       }
       return true;
     },
     {
-      message:
-        "Physical location or meeting location is required for events.",
+      message: "Physical location or meeting location is required for events.",
       path: ["physicalLocation"],
     },
   )
@@ -102,13 +113,17 @@ export const formSchema = basicFormSchemaObject
   )
   .refine(
     (data) => {
-      if (data.eventOptions?.isRecurringEvent && !data.eventOptions.recurringEventDetails) {
+      if (
+        data.eventOptions?.isRecurringEvent &&
+        !data.eventOptions.recurringEventDetails
+      ) {
         return false;
       }
       return true;
     },
     {
-      message: "Details for recurring events are required when 'Is Recurring Event' is selected.",
+      message:
+        "Details for recurring events are required when 'Is Recurring Event' is selected.",
       path: ["eventOptions", "recurringEventDetails"],
     },
   )
@@ -123,7 +138,8 @@ export const formSchema = basicFormSchemaObject
       return true;
     },
     {
-      message: "Event start date/deadline is required for all events or opportunities with a deadline.",
+      message:
+        "Event start date/deadline is required for all events or opportunities with a deadline.",
       path: ["eventOptions", "eventStartDate"],
     },
   )
@@ -143,40 +159,57 @@ export const formSchema = basicFormSchemaObject
       return true;
     },
     {
-      message: "Event start time, end date, and end time are required for non-all-day events. End dates for all day events are one day after the start date.",
+      message:
+        "Event start time, end date, and end time are required for non-all-day events. End dates for all day events are one day after the start date.",
       path: ["eventOptions", "eventStartTime", "eventEndDate", "eventEndTime"],
     },
   )
   .refine(
     (data) => {
       if (
-        (data.typeOfSubmission === "event" || data.typeOfSubmission === "opportunityWithDeadline") &&
+        (data.typeOfSubmission === "event" ||
+          data.typeOfSubmission === "opportunityWithDeadline") &&
         data.eventOptions?.isAllDayEvent
       ) {
-        const startDate = new Date(data.eventOptions.eventStartDate + "T00:00:00-05:00");
+        const startDate = new Date(
+          data.eventOptions.eventStartDate + "T00:00:00-05:00",
+        );
         startDate.setDate(startDate.getDate() + 1);
-        data.eventOptions.eventEndDate = startDate.toISOString().split('T')[0];
+        data.eventOptions.eventEndDate = startDate.toISOString().split("T")[0];
       }
       return true;
     },
     {
-      message: "Calendar end date set to one day after start date for all-day events or opportunities with a deadline.",
+      message:
+        "Calendar end date set to one day after start date for all-day events or opportunities with a deadline.",
       path: ["eventEndDate"],
     },
   )
   .refine(
     (data) => {
-      if (data.typeOfSubmission === "event" && !data.eventOptions?.isAllDayEvent) {
-        const startTime = new Date(data.eventOptions?.eventStartDate + 'T' + data.eventOptions?.eventStartTime);
-        const endTime = new Date(data.eventOptions?.eventEndDate + 'T' + data.eventOptions?.eventEndTime);
-        console.log(startTime, endTime)
-        console.log("startTime < endTime", startTime < endTime)
+      if (
+        data.typeOfSubmission === "event" &&
+        !data.eventOptions?.isAllDayEvent
+      ) {
+        const startTime = new Date(
+          data.eventOptions?.eventStartDate +
+            "T" +
+            data.eventOptions?.eventStartTime,
+        );
+        const endTime = new Date(
+          data.eventOptions?.eventEndDate +
+            "T" +
+            data.eventOptions?.eventEndTime,
+        );
+        console.log(startTime, endTime);
+        console.log("startTime < endTime", startTime < endTime);
         return startTime < endTime;
       }
       return true;
     },
     {
-      message: "Event start time and date must be before the event end time and date.",
+      message:
+        "Event start time and date must be before the event end time and date.",
       path: ["eventStartDate"],
     },
   )

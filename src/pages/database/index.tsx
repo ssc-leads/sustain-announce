@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { api } from "@/utils/api";
 import {
   Table,
@@ -11,21 +12,39 @@ import {
 import { AsyncButton, Button } from "@/components/ui/button";
 
 const DatabasePage = () => {
+  const [cutoffDate, setCutoffDate] = useState<string | undefined>(undefined);
   const {
     data: submissions,
     refetch,
     isLoading,
-  } = api.submissions.getAllSubmissions.useQuery();
+  } = api.submissions.getAllSubmissions.useQuery({ cutoffDate });
   const deleteSubmission = api.submissions.deleteSubmission.useMutation();
 
-  const handleDelete = async (index: number) => {
-    await deleteSubmission.mutateAsync({ index });
+  const handleDelete = async (id: string) => {
+    await deleteSubmission.mutateAsync({ id });
+    refetch();
+  };
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCutoffDate(event.target.value);
     refetch();
   };
 
   return (
     <div className="m-8">
       <h1 className="text-2xl font-bold">Submissions</h1>
+      <div className="mb-4">
+        <label htmlFor="cutoffDate" className="mr-2">
+          Cutoff Date:
+        </label>
+        <input
+          type="date"
+          id="cutoffDate"
+          value={cutoffDate || ""}
+          onChange={handleDateChange}
+          className="border p-2"
+        />
+      </div>
       {isLoading ? (
         <div>Loading...</div>
       ) : (
@@ -33,7 +52,7 @@ const DatabasePage = () => {
           <TableCaption>A list of your recent submissions.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Index</TableHead>
+              <TableHead>Id</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Event Title</TableHead>
@@ -47,10 +66,10 @@ const DatabasePage = () => {
           <TableBody>
             {submissions?.map((submission, index) => (
               <TableRow
-                key={index}
+                key={submission.id}
                 className={submission.exceedsTwoWeeks ? "bg-red-100" : ""}
               >
-                <TableCell>{index}</TableCell>
+                <TableCell>{submission.id}</TableCell>
                 <TableCell>{submission.name}</TableCell>
                 <TableCell>{submission.email}</TableCell>
                 <TableCell>{submission.eventTitle}</TableCell>
@@ -69,7 +88,7 @@ const DatabasePage = () => {
                 <TableCell>
                   <AsyncButton
                     action={async () => {
-                      await handleDelete(index);
+                      await handleDelete(submission.id);
                     }}
                   >
                     Delete
