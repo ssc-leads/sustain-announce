@@ -35,23 +35,24 @@ import { v4 } from "uuid";
 const SustainAnnounceShared = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: formSchema.parse({
-      id: "",
-      name: "John Doe",
-      email: "johndoe@example.com",
-      organizingGroup: "Sustainability Club",
-      typeOfSubmission: "opportunityWithoutDeadline",
-      eventTitle: "Green Campus Initiative",
-      shortTitle: "Green Campus",
-      url: "https://example.com/green-campus",
-      mainContactEmail: "contact@sustainabilityclub.com",
-      shortDescription: "Join us for a campus-wide sustainability event!",
-      firstAnnouncementDate: "2024-08-01",
-      lastAnnouncementDate: "2024-09-25",
-      advertiseOnSSCInsta: "Yes, please share on your story",
-      additionalComments: "We'd appreciate any help with promotion",
-      exceedsTwoWeeks: false,
-    }),
+    defaultValues: {} // uncomment the lines below to fill in default form values for quick testing
+    // formSchema.parse({
+    //   // Default values (commented out)
+    //   id: "",
+    //   name: "John Doe",
+    //   email: "johndoe@example.com",
+    //   organizingGroup: "Example Sustainability Club",
+    //   typeOfSubmission: "opportunityWithoutDeadline",
+    //   eventTitle: "Green Campus Initiative",
+    //   shortTitle: "Green Campus",
+    //   url: "https://example.com/green-campus",
+    //   mainContactEmail: "contact@sustainabilityclub.com",
+    //   shortDescription: "Join us for a campus-wide sustainability event!",
+    //   firstAnnouncementDate: "2024-08-01",
+    //   lastAnnouncementDate: "2024-09-25",
+    //   advertiseOnSSCInsta: "Yes, please share on your story",
+    //   additionalComments: "We'd appreciate any help with promotion",
+    //   exceedsTwoWeeks: false,})
   });
 
   const { mutate, status } = api.submissions.submit.useMutation();
@@ -97,6 +98,13 @@ const SustainAnnounceShared = () => {
   return (
     <Card className="mx-auto w-full max-w-3xl">
       <CardHeader>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <img
+            src="https://raw.githubusercontent.com/ssc-leads/sustain-announce/main/GoogleForms_SSCHeader.png"
+            alt="SSC Header"
+            width="400"
+          />
+        </div>
         <CardTitle>
           MIT Sustain Announce: Sustainability Events and Opportunity Newsletter
           Submission
@@ -104,11 +112,13 @@ const SustainAnnounceShared = () => {
         <CardDescription>
           Sustain Announce is a weekly digest of events, activities, and
           opportunities related to sustainability at MIT, especially those aimed
-          towards the student body. Sustain Announce is sent out on Monday of
+          towards the student body. Sustain Announce is generally sent out on Monday of
           each week (except Institute holidays and breaks). Submissions must be
           made before Sunday at noon (Eastern Time) to be included in the next
           day's Announce. Questions, feedback, and special requests can be
           directed to the Student Sustainability Coalition (SSC) Co-Leads at
+          ssc-leads@mit.edu. Confirmation emails are not sent, so you can assume that 
+          if you click submit, your submission was received. If in doubt, contact 
           ssc-leads@mit.edu.
         </CardDescription>
       </CardHeader>
@@ -120,7 +130,7 @@ const SustainAnnounceShared = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your name</FormLabel>
+                  <FormLabel>Your Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Your name" {...field} />
                   </FormControl>
@@ -134,12 +144,12 @@ const SustainAnnounceShared = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your email</FormLabel>
+                  <FormLabel>Your Email</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="Your email" {...field} />
                   </FormControl>
                   <FormDescription>
-                    A confirmation email will be sent to this email address
+                    In case we need to reach out to you with questions about your submission.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -209,13 +219,12 @@ const SustainAnnounceShared = () => {
               name="shortTitle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Short title</FormLabel>
+                  <FormLabel>Short Title</FormLabel>
                   <FormControl>
                     <Input placeholder="Short title" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is the hyperlinked label that goes at the top of the
-                    digest. Make it catchy! (If you leave this field empty, the
+                    This is a shorter title if needed in the email. Make it catchy! (If you leave this field empty, the
                     Short title will be your Event title truncated to 45
                     characters.)
                   </FormDescription>
@@ -234,7 +243,7 @@ const SustainAnnounceShared = () => {
                     <Input placeholder="https://" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This can be the URL of a signup form, facebook event, etc.
+                    This can be the URL for a sign up form, organizer webpage, etc.
                     The URL must have an http:// (or preferably https://) in
                     front.
                   </FormDescription>
@@ -254,7 +263,7 @@ const SustainAnnounceShared = () => {
                   </FormControl>
                   <FormDescription>
                     This should be the organizer or group responsible for the
-                    announcement/opportunity
+                    announcement/opportunity.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -266,9 +275,9 @@ const SustainAnnounceShared = () => {
               name="shortDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Short description</FormLabel>
+                  <FormLabel>Short Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Short description" {...field} />
+                    <Input placeholder="Short description of the event or opportunity, including all info needed to participate." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -306,7 +315,7 @@ const SustainAnnounceShared = () => {
                   <FormDescription>
                     This is the last date your announcement will be active.
                     Unless there is a compelling reason, each submission will
-                    run for two consecutive digests only. Note: if your event
+                    run for two consecutive weeks only. Note: if your event
                     ends before 9am on a Monday, do not include that Monday in
                     the range.
                   </FormDescription>
@@ -550,11 +559,11 @@ const SustainAnnounceShared = () => {
                 name="eventOptions.recurringEventDetails"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Recurring Event</FormLabel>
+                    <FormLabel>Recurring Event Details</FormLabel>
                     <Input {...field} />
                     <FormDescription>
                       Please add all details for the recurring date, time, and
-                      location (e.g., Every Friday at 2pm in ES2-451, except for
+                      location (e.g., Every Friday at 2pm in E52-451, except for
                       holidays).
                     </FormDescription>
                     <FormMessage />
@@ -573,3 +582,6 @@ const SustainAnnounceShared = () => {
 };
 
 export default SustainAnnounceShared;
+
+
+

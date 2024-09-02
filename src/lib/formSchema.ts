@@ -62,7 +62,7 @@ const basicFormSchemaObject = z.object({
       eventStartTime: z
         .string()
         .regex(/^\d{2}:\d{2}([AP]M)?$/, {
-          message: "Time must be in HH:MM or HH:MM AM/PM format (Eastern Time)",
+          message: "Time must be in HH:MM AM/PM format (Eastern Time)",
         })
         .optional(),
       eventEndDate: z
@@ -74,7 +74,7 @@ const basicFormSchemaObject = z.object({
       eventEndTime: z
         .string()
         .regex(/^\d{2}:\d{2}$/, {
-          message: "Time must be in HH:MM format (Eastern Time)",
+          message: "Time must be in HH:MM AM/PM format (Eastern Time)",
         })
         .optional(),
       recurringEventDetails: z.string().optional(),

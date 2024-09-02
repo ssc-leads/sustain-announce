@@ -35,14 +35,17 @@ export default function Homepage() {
 
   return (
     <div className="m-4 space-y-4">
-      <h1 className="text-2xl font-bold">Generate SSC Digest</h1>
-      <Input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-      />
+      <h1 className="text-2xl font-bold">Generate SSC Announce Email and Calendar Events</h1>
+      <label>
+        Enter Date of Next Email Here:
+        <Input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+      </label>
       <Textarea
-        placeholder="Enter additional content here for email."
+        placeholder="Enter additional content here for the email. This is preceded by 'SSC Updates:' after the template text of the email, so this is the place to put any specific updates from the SSC to be included in the email."
         value={additionalContent}
         onChange={(e) => setAdditionalContent(e.target.value)}
       />
@@ -79,9 +82,8 @@ export default function Homepage() {
           date={date}
         />
       ) : null}
-
+      <h4 className="text-sm font-bold">Below is the raw HTML of the auto-generated email content. Copy the HTML code below and paste it into the Engage Email Composer after selecting the 'Source' option in the editor.</h4>      
       <Textarea value={emailContent} readOnly />
-
       {submissions.length > 0 && (
         <Button
           className="mt-4 w-full"
@@ -130,9 +132,12 @@ export default function Homepage() {
             }
           }}
         >
-          Download CSV
+          Download Calendar Events CSV (import this file to the MIT Sustainability Opportunities Google Calendar)
         </Button>
+
       )}
+      <h4 className="text-sm font-bold">NOTE: The downloaded CSV may have duplicate submissions/events from prior weeks. Open the CSV and delete rows that were already imported previously, or manually delete duplicates after importing on Google Calendar.</h4>      
+
     </div>
   );
 }
@@ -177,28 +182,46 @@ function FullEmail({
           <Text>
             Sustain Announce is the{" "}
             <Link href="https://ssc.mit.edu">
-              Student Sustainability Coalition's
+              Student Sustainability Coalition (SSC)'s
             </Link>{" "}
             weekly announcement email of sustainability-related events and
-            opportunities sent to the MIT community.{" "}
-            <Link href="https://sustain-announce.vercel.app/submit">
-              Click here
-            </Link>{" "}
-            to submit an announcement to be included in a future email or click
-            here to access the Events Calendar, updated weekly.
-          </Text>
-          {additionalText && (
-            <Text>
-              <strong>SSC Updates:</strong> {additionalText}
+            opportunities sent to the MIT community. Click the green calendar 
+            icons next to event/opportunity titles below to add them to your 
+            calendar. General MIT sustainability resources can be found at{" "} 
+            <Link href="https://ssc.mit.edu/resources">
+              https://ssc.mit.edu/resources
+            </Link>.
             </Text>
-          )}
+            <div className="flex justify-center space-x-4 mt-4">
+              <Link href="https://sustain-announce.vercel.app/submit">
+                <Button>
+                  Submit an event/announcement
+                </Button>
+              </Link>
+              <Link href="https://calendar.google.com/calendar/u/0?cid=Y185MmwzaTc1NjlhZWJxcGhiYzNhZTNzNGEyY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t">
+                <Button>
+                  Add the MIT Sustainability Opportunities Calendar
+                </Button>
+              </Link>
+              <Link href="https://mailman.mit.edu/mailman/listinfo/sustain-interest">
+                <Button>
+                  (Un)subscribe to sustain-interest@mit.edu
+                </Button>
+              </Link>
+
+            </div>
+            {additionalText && (
+              <Text>
+                <strong>Updates from the SSC:</strong> {additionalText}
+              </Text>
+            )}
         </Section>
 
         <Text className="text-xl font-bold">Events</Text>
         {categorizedEvents.events.map((event, index) => (
           <Opportunity key={index} event={event} />
         ))}
-        <Text className="mt-4 text-xl font-bold">Opportunities</Text>
+        <Text className="mt-4 text-xl font-bold">Opportunities and Announcements</Text>
         {categorizedEvents.opportunitiesWithDeadline.map((event, index) => (
           <Opportunity key={index} event={event} />
         ))}
@@ -219,15 +242,15 @@ function Opportunity({ event }: { event: z.infer<typeof formSchema> }) {
     timeZone: "UTC",
   })}${
     event.eventOptions?.eventStartTime
-      ? ` at ${new Date(`2000-01-01T${event.eventOptions.eventStartTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`
+      ? ` ${new Date(`2000-01-01T${event.eventOptions.eventStartTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`
       : ""
   }${
-    event.eventOptions?.eventEndDate
+    (event.eventOptions?.eventEndDate && event.eventOptions.eventEndDate !== event.eventOptions.eventStartDate)
       ? ` to ${new Date(event.eventOptions.eventEndDate + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" })}`
       : ""
   }${
     event.eventOptions?.eventEndTime
-      ? ` at ${new Date(`2000-01-01T${event.eventOptions.eventEndTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`
+      ? ` ${event.eventOptions.eventEndDate === event.eventOptions.eventStartDate ? "to " : ""}${new Date(`2000-01-01T${event.eventOptions.eventEndTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`
       : ""
   }${
     event.eventOptions?.isRecurringEvent &&
@@ -235,7 +258,6 @@ function Opportunity({ event }: { event: z.infer<typeof formSchema> }) {
       ? ` (${event.eventOptions.recurringEventDetails})`
       : ""
   }`;
-
   return (
     <Section className="mb-4 border border-gray-300 bg-white shadow-xl">
       <Row className="">
@@ -274,15 +296,17 @@ function Opportunity({ event }: { event: z.infer<typeof formSchema> }) {
             )}
           </Text>
           {event.eventOptions?.eventStartDate && (
-            <Text className="m-0 text-sm text-gray-600">
-              <b>When:</b> {eventDateTime}
-            </Text>
+            <>
+              <Text className="m-0 text-sm text-gray-600">
+                <b>{event.typeOfSubmission === "opportunityWithDeadline" ? "Deadline:" : "When:"}</b> {eventDateTime}
+              </Text>
+              {event.typeOfSubmission === "event" && (
+                <Text className="m-0 text-sm text-gray-600">
+                  <b>Location:</b> {event.physicalLocation}
+                </Text>
+              )}
+            </>
           )}
-          {event.physicalLocation ? (
-            <Text className="m-0 text-sm text-gray-600">
-              <b>Location:</b> {event.physicalLocation}
-            </Text>
-          ) : null}
           {event.eventCategory && (
             <Text className="m-0 text-sm text-gray-600">
               <b>Type:</b> {event.eventCategory}
@@ -315,3 +339,4 @@ function Opportunity({ event }: { event: z.infer<typeof formSchema> }) {
     </Section>
   );
 }
+
