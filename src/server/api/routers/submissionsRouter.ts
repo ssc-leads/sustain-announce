@@ -52,4 +52,31 @@ export const submissionsRouter = createTRPCRouter({
 
       return filteredSubmissions;
     }),
+  getAllSubmissions: publicProcedure.query(async () => {
+    const allSubmissions = await kv.get<string[]>("submissions");
+    const parsedSubmissions = allSubmissions
+      ? allSubmissions
+          .map((submission) => {
+            try {
+              return formSchema.parse(JSON.parse(submission));
+            } catch (error) {
+              return null;
+            }
+          })
+          .filter(
+            (submission): submission is z.infer<typeof formSchema> =>
+              submission !== null,
+          )
+      : [];
+    return parsedSubmissions;
+  }),
+
+  deleteSubmission: publicProcedure
+    .input(z.object({ index: z.number() }))
+    .mutation(async ({ input }) => {
+      let submissions = (await kv.get<string[]>("submissions")) || [];
+      submissions = submissions.filter((_, i) => i !== input.index);
+      await kv.set("submissions", submissions);
+      return { success: true };
+    }),
 });
