@@ -1,11 +1,30 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
+import { useState } from "react";
 
 export default function Homepage() {
-  const { data } = api.submissions.getAllSubmissions.useQuery();
+  // const [date, setDate] = useState<Date | undefined>(undefined);
+
+  const { data } = api.submissions.getAllSubmissions.useQuery({
+    date: date ?? new Date()
+  });
+
+  const [value, setValue] = useState<string>("foo");
+
 
   return (
-    <div className="space-y-4">
-      {data?.map((submission, index) => (
+    <div className="space-y-4 m-4">
+      {value}
+      <Button onClick={() => {
+        setValue(value + " clicked ")
+      }}>
+        Hello
+      </Button>
+      {/* <Input placeholder="Fill in value" value={value} onChange={(e) => setValue(e.target.value)}/> */}
+      {/* <Input type="date" onChange={(e) => setDate(new Date(e.target.value))} value={date?.toString()}
+      /> */}
+      {/* {data?.map((submission, index) => (
         <div key={index} className="rounded-lg border p-4">
           <h2 className="mb-2 text-xl font-bold">{submission.eventTitle}</h2>
           <p>
@@ -49,7 +68,7 @@ export default function Homepage() {
             Copy as HTML
           </button>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 }

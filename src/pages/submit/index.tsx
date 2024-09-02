@@ -47,7 +47,7 @@ const SustainAnnounceShared = () => {
       shortDescription: "Join us for a campus-wide sustainability event!",
       firstAnnouncementDate: "2024-08-01",
       lastAnnouncementDate: "2024-09-25",
-      advertiseOnSSCIntsa: "Yes, please share on your story",
+      advertiseOnSSCInsta: "Yes, please share on your story",
       additionalComments: "We'd appreciate any help with promotion",
       exceedsTwoWeeks: false,
     }),
@@ -59,19 +59,32 @@ const SustainAnnounceShared = () => {
   const showAdditionalFields =
     typeOfSubmission === "event" ||
     typeOfSubmission === "opportunityWithDeadline";
-
+  const isEvent = typeOfSubmission === "event";
+  const hasDeadline = 
+    typeOfSubmission === "opportunityWithDeadline";
   const eventCategory = form.watch("eventCategory");
   const allDay = form.watch("eventOptions.isAllDayEvent");
   const isRecurringEvent = form.watch("eventOptions.isRecurringEvent");
 
-  const noTime =
-    eventCategory === "Scholarship/Fellowship Deadline" ||
+  const noTime = eventCategory === "Scholarship/Fellowship Deadline" ||
     eventCategory === "Job/Internship/Research Opportunity (Paid)" ||
     eventCategory === "Volunteer Opportunity (Unpaid)" ||
     eventCategory === "Leadership Opportunity" ||
     eventCategory === "Other Application Deadline" ||
     eventCategory === "Announcement with a Deadline" ||
     allDay;
+
+  console.log("typeOfSubmission", typeOfSubmission)
+  console.log("noTime", noTime)
+  console.log("eventCategory", eventCategory)
+  console.log("allDay", allDay)
+  console.log("hasDeadline", hasDeadline)
+  console.log(JSON.stringify({
+    startDate: form.watch("eventOptions.eventStartDate"),
+    startTime: form.watch("eventOptions.eventStartTime"),
+    endDate: form.watch("eventOptions.eventEndDate"),
+    endTime: form.watch("eventOptions.eventEndTime")
+  }));
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     mutate(values);
@@ -197,8 +210,8 @@ const SustainAnnounceShared = () => {
                     <Input placeholder="Short title" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is the hyperlinked label that goes in the table of
-                    contents at the top of the Anno. Make it catchy! (If you
+                    This is the hyperlinked label that goes at the top of the digest. 
+                    Make it catchy! (If you
                     leave this field empty, the Short title will be your Event
                     title truncated to 45 characters.)
                   </FormDescription>
@@ -300,7 +313,7 @@ const SustainAnnounceShared = () => {
 
             <FormField
               control={form.control}
-              name="advertiseOnSSCIntsa"
+              name="advertiseOnSSCInsta"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -347,25 +360,6 @@ const SustainAnnounceShared = () => {
 
             {showAdditionalFields && (
               <>
-                <FormField
-                  control={form.control}
-                  name="physicalLocation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Physical Location or Meeting Link (if fully virtual)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="Please include room number if applicable"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="eventOptions"
@@ -438,7 +432,7 @@ const SustainAnnounceShared = () => {
                   name="eventCategory"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Event Category</FormLabel>
+                      <FormLabel>Event/Opportunity Category</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -457,7 +451,7 @@ const SustainAnnounceShared = () => {
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        Choose the category that best describes your event.
+                        Choose the category that best describes your event or opportunity.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -465,7 +459,101 @@ const SustainAnnounceShared = () => {
                 />
               </>
             )}
-
+            {showAdditionalFields && isEvent && (
+              <FormField
+                control={form.control}
+                name="physicalLocation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Physical Location or Meeting Link (if fully virtual)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Please include room number if applicable"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+              {showAdditionalFields && (
+                <FormField
+                  control={form.control}
+                  name="eventOptions.eventStartDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Start Date or Deadline</FormLabel>
+                      <Input type="date" {...field} />
+                      <FormDescription>
+                        If this is a deadline for an opportunity or announcement, or an all-day event, this field is required.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+                {( showAdditionalFields && !hasDeadline && !allDay ) && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="eventOptions.eventStartTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Start Time</FormLabel>
+                          <Input type="time" {...field} />
+                          <FormDescription>
+                            All times should be in Eastern Time.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="eventOptions.eventEndDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event End Date</FormLabel>
+                          <Input type="date" {...field} />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="eventOptions.eventEndTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event End Time</FormLabel>
+                          <Input type="time" {...field} />
+                          <FormDescription>
+                            All times should be in Eastern Time.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+                {isRecurringEvent && (
+                  <FormField
+                    control={form.control}
+                    name="eventOptions.recurringEventDetails"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Recurring Event</FormLabel>
+                        <Input {...field} />
+                        <FormDescription>
+                          Please add all details for the recurring date, time, and location (e.g., Every Friday at 2pm in ES2-451, except for holidays).
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
             <Button type="submit" disabled={status === "pending"}>
               {status === "pending" ? "Loading..." : "Submit"}
             </Button>
