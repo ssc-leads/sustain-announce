@@ -1,6 +1,7 @@
 import { GeistSans } from "geist/font/sans";
 import { type AppType } from "next/app";
 
+import { Toaster } from "@/components/ui/toaster";
 import { api } from "@/utils/api";
 
 import "@/styles/globals.css";
@@ -15,6 +16,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       </Head>
       <div className={`w-full ${GeistSans.className}`}>
         <Component {...pageProps} />
+        <Toaster />
       </div>
     </>
   );
