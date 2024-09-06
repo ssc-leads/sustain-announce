@@ -103,19 +103,9 @@ const SustainAnnounceShared = () => {
   const allDay = form.watch("eventOptions.isAllDayEvent");
   const isRecurringEvent = form.watch("eventOptions.isRecurringEvent");
 
-  // Determine if time fields should be shown
-  const noTime =
-    eventCategory === "Scholarship/Fellowship Deadline" ||
-    eventCategory === "Job/Internship/Research Opportunity (Paid)" ||
-    eventCategory === "Volunteer Opportunity (Unpaid)" ||
-    eventCategory === "Leadership Opportunity" ||
-    eventCategory === "Other Application Deadline" ||
-    eventCategory === "Announcement with a Deadline" ||
-    allDay;
 
   // Log form state for debugging
   // console.log("typeOfSubmission", typeOfSubmission);
-  // console.log("noTime", noTime);
   // console.log("eventCategory", eventCategory);
   // console.log("allDay", allDay);
   // console.log("hasDeadline", hasDeadline);
