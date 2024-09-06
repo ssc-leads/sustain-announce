@@ -15,7 +15,7 @@ import * as z from "zod";
 import { v4 } from "uuid";
 
 // Define a boolean flag to toggle default values
-const USE_DEFAULT_VALUES = false; // Set to true for testing/development, false for production
+const USE_DEFAULT_VALUES = true; // Set to true for testing/development, false for production
 
 // Define default values for the form
 const defaultValues = USE_DEFAULT_VALUES
