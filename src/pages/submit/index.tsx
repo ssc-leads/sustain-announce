@@ -2,48 +2,84 @@
 
 // Import necessary components and utilities
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { EVENT_CATEGORIES, formSchema } from "@/lib/formSchema";
 import { api } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { v4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 
 // Define a boolean flag to toggle default values
-const USE_DEFAULT_VALUES = true; // Set to true for testing/development, false for production
+const USE_DEFAULT_VALUES = false; // Set to true for testing/development, false for production
 
 // Define default values for the form
+const defaultValuesFilled: z.infer<typeof formSchema> = formSchema.parse({
+  id: "",
+  name: "John Doe",
+  email: "johndoe@example.com",
+  organizingGroup: "Example Sustainability Club",
+  typeOfSubmission: "opportunityWithoutDeadline",
+  eventTitle: "Green Campus Initiative",
+  shortTitle: "Green Campus",
+  url: "https://example.com/green-campus",
+  mainContactEmail: "contact@sustainabilityclub.com",
+  shortDescription: "Join us for a campus-wide sustainability event!",
+  firstAnnouncementDate: "2024-08-01",
+  lastAnnouncementDate: "2024-09-25",
+  advertiseOnSSCInsta: "Yes, please share on your story",
+  additionalComments: "We'd appreciate any help with promotion",
+  exceedsTwoWeeks: false,
+  eventOptions: {
+    addToCalendar: true, // Set this to true by default
+  },
+});
+const defaultValuesEmpty: z.infer<typeof formSchema> = {
+  id: "",
+  name: "",
+  email: "",
+  organizingGroup: "",
+  typeOfSubmission: "event",
+  eventTitle: "",
+  shortTitle: "",
+  url: "",
+  mainContactEmail: "",
+  shortDescription: "",
+  firstAnnouncementDate: "",
+  lastAnnouncementDate: "",
+  advertiseOnSSCInsta: "",
+  additionalComments: "",
+  exceedsTwoWeeks: false,
+};
+
 const defaultValues = USE_DEFAULT_VALUES
-  ? formSchema.parse({
-      id: "",
-      name: "John Doe",
-      email: "johndoe@example.com",
-      organizingGroup: "Example Sustainability Club",
-      typeOfSubmission: "opportunityWithoutDeadline",
-      eventTitle: "Green Campus Initiative",
-      shortTitle: "Green Campus",
-      url: "https://example.com/green-campus",
-      mainContactEmail: "contact@sustainabilityclub.com",
-      shortDescription: "Join us for a campus-wide sustainability event!",
-      firstAnnouncementDate: "2024-08-01",
-      lastAnnouncementDate: "2024-09-25",
-      advertiseOnSSCInsta: "Yes, please share on your story",
-      additionalComments: "We'd appreciate any help with promotion",
-      exceedsTwoWeeks: false,
-      eventOptions: {
-        addToCalendar: true, // Set this to true by default
-      },
-    })
-  : {
-      eventOptions: {
-        addToCalendar: true, // Also set this to true for non-testing mode
-      },
-    };
+  ? defaultValuesFilled
+  : defaultValuesEmpty;
 
 // Main component for the Sustain Announce submission form with default values
 const SustainAnnounceShared = () => {
@@ -94,6 +130,7 @@ const SustainAnnounceShared = () => {
 
   // Handle form submission
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    alert(JSON.stringify(values, null, 2));
     values["id"] = v4(); // Generate a unique ID for the submission
     mutate(values);
   };
@@ -102,7 +139,7 @@ const SustainAnnounceShared = () => {
   return (
     <Card className="mx-auto w-full max-w-3xl">
       <CardHeader>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <img
             src="https://raw.githubusercontent.com/ssc-leads/sustain-announce/main/GoogleForms_SSCHeader.png"
             alt="SSC Header"
@@ -116,14 +153,14 @@ const SustainAnnounceShared = () => {
         <CardDescription>
           Sustain Announce is a weekly digest of events, activities, and
           opportunities related to sustainability at MIT, especially those aimed
-          towards the student body. Sustain Announce is generally sent out on Monday of
-          each week (except Institute holidays and breaks). Submissions must be
-          made before Sunday at noon (Eastern Time) to be included in the next
-          day's Announce. Questions, feedback, and special requests can be
-          directed to the Student Sustainability Coalition (SSC) Co-Leads at
-          ssc-leads@mit.edu. Confirmation emails are not sent, so you can assume that 
-          if you click submit, your submission was received. If in doubt, contact 
-          ssc-leads@mit.edu.
+          towards the student body. Sustain Announce is generally sent out on
+          Monday of each week (except Institute holidays and breaks).
+          Submissions must be made before Sunday at noon (Eastern Time) to be
+          included in the next day's Announce. Questions, feedback, and special
+          requests can be directed to the Student Sustainability Coalition (SSC)
+          Co-Leads at ssc-leads@mit.edu. Confirmation emails are not sent, so
+          you can assume that if you click submit, your submission was received.
+          If in doubt, contact ssc-leads@mit.edu.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -153,7 +190,8 @@ const SustainAnnounceShared = () => {
                     <Input type="email" placeholder="Your email" {...field} />
                   </FormControl>
                   <FormDescription>
-                    In case we need to reach out to you with questions about your submission.
+                    In case we need to reach out to you with questions about
+                    your submission.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -228,9 +266,9 @@ const SustainAnnounceShared = () => {
                     <Input placeholder="Short title" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is a shorter title if needed in the email. Make it catchy! (If you leave this field empty, the
-                    Short title will be your Event title truncated to 45
-                    characters.)
+                    This is a shorter title if needed in the email. Make it
+                    catchy! (If you leave this field empty, the Short title will
+                    be your Event title truncated to 45 characters.)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -247,9 +285,9 @@ const SustainAnnounceShared = () => {
                     <Input placeholder="https://" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This can be the URL for a sign up form, organizer webpage, etc.
-                    The URL must have an http:// (or preferably https://) in
-                    front.
+                    This can be the URL for a sign up form, organizer webpage,
+                    etc. The URL must have an http:// (or preferably https://)
+                    in front.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -263,7 +301,11 @@ const SustainAnnounceShared = () => {
                 <FormItem>
                   <FormLabel>Main Contact Email*</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="example@mit.edu" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="example@mit.edu"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     This should be the organizer or group responsible for the
@@ -281,7 +323,10 @@ const SustainAnnounceShared = () => {
                 <FormItem>
                   <FormLabel>Short Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Short description of the event or opportunity, including all info needed to participate." {...field} />
+                    <Input
+                      placeholder="Short description of the event or opportunity, including all info needed to participate."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -319,9 +364,9 @@ const SustainAnnounceShared = () => {
                   <FormDescription>
                     This is the last date your announcement will be active.
                     Unless there is a compelling reason, each submission will
-                    run for two consecutive weeks only. Note: if your event
-                    ends before 9am on a Monday, do not include that Monday in
-                    the range.
+                    run for two consecutive weeks only. Note: if your event ends
+                    before 9am on a Monday, do not include that Monday in the
+                    range.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -597,8 +642,23 @@ const SustainAnnounceForm = () => {
     },
   });
 
+  const { toast } = useToast();
+
   // Set up mutation for form submission
-  const { mutate, status } = api.submissions.submit.useMutation();
+  const { mutate, status } = api.submissions.submit.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Submission successful",
+        description: "Your submission has been sent to the SSC.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Submission failed",
+        description: error.message,
+      });
+    },
+  });
 
   // Watch form fields for conditional rendering
   const typeOfSubmission = form.watch("typeOfSubmission");
@@ -646,7 +706,7 @@ const SustainAnnounceForm = () => {
   return (
     <Card className="mx-auto w-full max-w-3xl">
       <CardHeader>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <img
             src="https://raw.githubusercontent.com/ssc-leads/sustain-announce/main/GoogleForms_SSCHeader.png"
             alt="SSC Header"
@@ -660,14 +720,14 @@ const SustainAnnounceForm = () => {
         <CardDescription>
           Sustain Announce is a weekly digest of events, activities, and
           opportunities related to sustainability at MIT, especially those aimed
-          towards the student body. Sustain Announce is generally sent out on Monday of
-          each week (except Institute holidays and breaks). Submissions must be
-          made before Sunday at noon (Eastern Time) to be included in the next
-          day's Announce. Questions, feedback, and special requests can be
-          directed to the Student Sustainability Coalition (SSC) Co-Leads at
-          ssc-leads@mit.edu. Confirmation emails are not sent, so you can assume that 
-          if you click submit, your submission was received. If in doubt, contact 
-          ssc-leads@mit.edu.
+          towards the student body. Sustain Announce is generally sent out on
+          Monday of each week (except Institute holidays and breaks).
+          Submissions must be made before Sunday at noon (Eastern Time) to be
+          included in the next day's Announce. Questions, feedback, and special
+          requests can be directed to the Student Sustainability Coalition (SSC)
+          Co-Leads at ssc-leads@mit.edu. Confirmation emails are not sent, so
+          you can assume that if you click submit, your submission was received.
+          If in doubt, contact ssc-leads@mit.edu.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -697,7 +757,8 @@ const SustainAnnounceForm = () => {
                     <Input type="email" placeholder="Your email" {...field} />
                   </FormControl>
                   <FormDescription>
-                    In case we need to reach out to you with questions about your submission.
+                    In case we need to reach out to you with questions about
+                    your submission.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -772,9 +833,9 @@ const SustainAnnounceForm = () => {
                     <Input placeholder="Short title" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is a shorter title if needed in the email. Make it catchy! (If you leave this field empty, the
-                    Short title will be your Event title truncated to 45
-                    characters.)
+                    This is a shorter title if needed in the email. Make it
+                    catchy! (If you leave this field empty, the Short title will
+                    be your Event title truncated to 45 characters.)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -791,9 +852,9 @@ const SustainAnnounceForm = () => {
                     <Input placeholder="https://" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This can be the URL for a sign up form, organizer webpage, etc.
-                    The URL must have an http:// (or preferably https://) in
-                    front.
+                    This can be the URL for a sign up form, organizer webpage,
+                    etc. The URL must have an http:// (or preferably https://)
+                    in front.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -807,7 +868,11 @@ const SustainAnnounceForm = () => {
                 <FormItem>
                   <FormLabel>Main Contact Email*</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="example@mit.edu" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="example@mit.edu"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     This should be the organizer or group responsible for the
@@ -825,7 +890,10 @@ const SustainAnnounceForm = () => {
                 <FormItem>
                   <FormLabel>Short Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Short description of the event or opportunity, including all info needed to participate." {...field} />
+                    <Input
+                      placeholder="Short description of the event or opportunity, including all info needed to participate."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -863,9 +931,9 @@ const SustainAnnounceForm = () => {
                   <FormDescription>
                     This is the last date your announcement will be active.
                     Unless there is a compelling reason, each submission will
-                    run for two consecutive weeks only. Note: if your event
-                    ends before 9am on a Monday, do not include that Monday in
-                    the range.
+                    run for two consecutive weeks only. Note: if your event ends
+                    before 9am on a Monday, do not include that Monday in the
+                    range.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -1119,7 +1187,11 @@ const SustainAnnounceForm = () => {
                 )}
               />
             )}
-            <Button type="submit" disabled={status === "pending"}>
+            <Button
+              onClick={() => onSubmit(form.getValues())}
+              // type="submit"
+              disabled={status === "pending"}
+            >
               {status === "pending" ? "Loading..." : "Submit"}
             </Button>
           </form>
@@ -1131,6 +1203,3 @@ const SustainAnnounceForm = () => {
 
 // Export the appropriate component based on USE_DEFAULT_VALUES
 export default USE_DEFAULT_VALUES ? SustainAnnounceShared : SustainAnnounceForm;
-
-
-
