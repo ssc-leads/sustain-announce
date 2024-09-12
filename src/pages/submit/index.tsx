@@ -36,8 +36,7 @@ import { v4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
 
 // Define a boolean flag to toggle default values
-const USE_DEFAULT_VALUES = false; // Set to true for testing/development, false for production
-
+const USE_DEFAULT_VALUES = false; // set to true for testing/development, false for production
 // Define default values for the form
 const defaultValuesFilled: z.infer<typeof formSchema> = formSchema.parse({
   id: "",
@@ -140,19 +139,26 @@ const SustainAnnounceShared = () => {
           MIT Sustain Announce: Sustainability Events and Opportunity Newsletter
           Submission
         </CardTitle>
-        <CardDescription>
-          Sustain Announce is a weekly digest of events, activities, and
-          opportunities related to sustainability at MIT, especially those aimed
-          towards the student body. Sustain Announce is generally sent out on
-          Monday of each week (except Institute holidays and breaks).
-          Submissions must be made before Sunday at noon (Eastern Time) to be
-          included in the next day's Announce. Questions, feedback, and special
-          requests can be directed to the Student Sustainability Coalition (SSC)
-          Co-Leads at ssc-leads@mit.edu. Confirmation emails are not sent, so
-          you can assume that if you click submit, your submission was received.
-          If in doubt, contact ssc-leads@mit.edu.
-        </CardDescription>
       </CardHeader>
+          <CardDescription>
+      <p className="font-bold mb-2">
+        Sustain Announce is a weekly digest of events, activities, and opportunities related to sustainability at MIT, especially those aimed towards the student body.
+      </p>
+      <ul className="list-disc pl-5 mb-2 space-y-2">
+        <li>
+          <span className="font-bold">Submission Deadline:</span> Sustain Announce is generally sent out on Monday of each week (except Institute holidays and breaks). 
+          <span className="font-bold"> Submissions must be made before Sunday at noon (Eastern Time) to be included in the next day's Announce.</span>
+        </li>
+        <li>
+          <span className="font-bold">Contact:</span> Questions, feedback, and special requests can be directed to the Student Sustainability Coalition (SSC) Co-Leads at 
+          <span className="font-bold"> ssc-leads@mit.edu</span>.
+        </li>
+        <li>
+          <span className="font-bold">Edits:</span> Confirmation emails are not sent, so you can assume that if you click submit and receive a success message, your submission was received. If in doubt or any edits are needed, email 
+          <span className="font-bold"> ssc-leads@mit.edu</span>.
+        </li>
+      </ul>
+      </CardDescription>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
